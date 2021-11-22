@@ -1,0 +1,27 @@
+version: "3.7"
+
+services:
+  gecco:
+    build: ./
+    container_name: gecco
+    restart: unless-stopped
+    expose:
+      - "18862"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.tcp.routers.gecco.entrypoints=rpc"
+      - "traefik.tcp.routers.gecco.rule=HostSNI(`*`)"
+      # - "traefik.tcp.routers.gecco.rule=HostSNI(`gecco.company.com`)"
+      - "traefik.tcp.routers.gecco.service=gecco"
+      - "traefik.tcp.services.gecco.loadbalancer.server.port=18862"
+      - "traefik.tcp.routers.gecco.tls=true"
+      - "traefik.tcp.routers.gecco.tls.passthrough=true"
+    volumes:
+      - $HOME/certs:/certs/
+    networks:
+      - company-network
+
+networks:
+  company-network:
+    external:
+      name: company-network
